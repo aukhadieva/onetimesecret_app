@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 load_dotenv()
 
 engine = create_async_engine(os.getenv('DATABASE_URL'), echo=True)
-AsyncSessionLocal = sessionmaker(bind=engine,class_=AsyncSession,expire_on_commit=False)
+AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False, autoflush=False)
 Base = declarative_base()
 
 
