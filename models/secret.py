@@ -37,7 +37,7 @@ class Secret(Base):
     user = relationship('User', back_populates='secrets')
 
     # Проверка наличия хотя бы одного из полей секрета (secret_content или secret_password)
-    __tableargs__ = (
+    __table_args__ = (
         CheckConstraint(
             'secret_content IS NOT NULL OR secret_password IS NOT NULL'
         )
