@@ -33,12 +33,12 @@ class Secret(Base):
     lifetime = Column(EnumType(Lifetime), nullable=False)
     link = Column(String)
 
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='secrets')
 
     # Проверка наличия хотя бы одного из полей секрета (secret_content или secret_password)
     __table_args__ = (
         CheckConstraint(
             'secret_content IS NOT NULL OR secret_password IS NOT NULL'
-        )
+        ),
     )
