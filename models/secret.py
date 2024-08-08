@@ -13,10 +13,8 @@ class Lifetime(str, Enum):
     five_min = '5 минут'
     thirty_min = '30 минут'
     one_hour = '1 час'
-    four_hours = '4 часа'
     twelve_hours = '12 часов'
     one_day = '1 день'
-    three_days = '3 дня'
     seven_days = '7 дней'
     fourteen_days = '14 дней'
 
