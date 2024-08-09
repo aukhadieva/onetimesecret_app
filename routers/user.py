@@ -23,7 +23,7 @@ async def add_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
 
 
 @router.put('/users/{user_id}', response_model=UserOut)
-async def add_user(user_id: int, user: UserUpdate, db: AsyncSession = Depends(get_db)):
+async def update_user(user_id: int, user: UserUpdate, db: AsyncSession = Depends(get_db)):
     """
     Обновляет информации о пользователе.
 
