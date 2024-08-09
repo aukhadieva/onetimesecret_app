@@ -1,4 +1,5 @@
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,9 +19,13 @@ async def add_user(user: UserCreate, db: AsyncSession):
     hashed_password = hash_password(user.password)
     db_user = User(email=user.email, password=hashed_password)
     db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
-    return db_user
+    try:
+        await db.commit()
+        await db.refresh(db_user)
+        return db_user
+    except IntegrityError as error:
+        await db.rollback()
+        raise HTTPException(status_code=409, detail='Пользователь с таким email уже существует')
 
 
 async def update_user(user_id: int, user: UserUpdate, db: AsyncSession):
