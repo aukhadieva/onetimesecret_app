@@ -7,14 +7,12 @@ class UserBase(BaseModel):
     Базовая модель для описания пользователей.
     """
     email: EmailStr
-    password: str
 
 
 class UserCreate(UserBase):
     """
     Модель создания пользователя с полями email и password.
     """
-    email: EmailStr
     password: str = Field(..., min_length=6)
 
 
@@ -31,3 +29,10 @@ class UserOut(UserBase):
     Модель для вывода пользователей с полями id, email и password.
     """
     id: int
+
+    class Config:
+        """
+        Конфигурационный класс для настройки ORM.
+        Позволяет использовать ORM-объекты для сериализации.
+        """
+        orm_mode = True
