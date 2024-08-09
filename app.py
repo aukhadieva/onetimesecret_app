@@ -3,7 +3,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from config.middleware import LogMiddleware
 from database.db import create_tables, AsyncSessionLocal
-from routers import user, secret, auth
+from routers import user, secret, token
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ app.add_middleware(
 
 app.include_router(user.router)
 app.include_router(secret.router)
-app.include_router(auth.router)
+app.include_router(token.router)
 
 
 @app.on_event('startup')

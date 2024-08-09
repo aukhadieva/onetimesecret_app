@@ -1,10 +1,22 @@
 from fastapi import HTTPException
+from passlib.context import CryptContext
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from config.jwt_authorization import hash_password
 from models.user import User
 from schemas.user import UserCreate, UserUpdate
+
+
+def hash_password(password: str) -> str:
+    """
+    Хеширует пароль с использованием алгоритма bcrypt.
+
+    :param password: пароль для хеширования (тип str)
+    :return: захешированный пароль (тип str)
+    """
+    pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+    return pwd_context.hash(password)
 
 
 async def add_user(user: UserCreate, db: AsyncSession):
@@ -18,9 +30,13 @@ async def add_user(user: UserCreate, db: AsyncSession):
     hashed_password = hash_password(user.password)
     db_user = User(email=user.email, password=hashed_password)
     db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
-    return db_user
+    try:
+        await db.commit()
+        await db.refresh(db_user)
+        return db_user
+    except IntegrityError as error:
+        await db.rollback()
+        raise HTTPException(status_code=409, detail='Пользователь с таким email уже существует')
 
 
 async def update_user(user_id: int, user: UserUpdate, db: AsyncSession):
@@ -102,4 +118,6 @@ async def get_user_by_email(email: str, db: AsyncSession) -> User:
     """
     result = await db.execute(select(User).filter(User.email == email))
     db_user = result.scalars().first()
+    if db_user is None:
+        raise HTTPException(status_code=404, detail='Пользователь не найден')
     return db_user
