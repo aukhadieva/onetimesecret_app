@@ -1,21 +1,10 @@
 from fastapi import HTTPException
-from passlib.context import CryptContext
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.jwt_authorization import hash_password
 from models.user import User
 from schemas.user import UserCreate, UserUpdate
-
-
-def hash_password(password: str) -> str:
-    """
-    Хеширует пароль с использованием bcrypt.
-
-    :param password: пароль для хеширования
-    :return: хеш пароля
-    """
-    pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
-    return pwd_context.hash(password)
 
 
 async def add_user(user: UserCreate, db: AsyncSession):
@@ -48,10 +37,12 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession):
     if db_user is None:
         raise HTTPException(status_code=404, detail='Пользователь не найден')
 
-    if user.email is not None:
-        db_user.email = user.email
-    if user.password is not None:
+    if user.password is not None and user.password != db_user.password:
         db_user.password = hash_password(user.password)
+
+    for var, value in vars(user).items():
+        if value is not None:
+            setattr(db_user, var, value)
 
     await db.commit()
     await db.refresh(db_user)
@@ -98,4 +89,17 @@ async def delete_user(user_id: int, db: AsyncSession):
         raise HTTPException(status_code=404, detail='Пользователь не найден')
     await db.delete(db_user)
     await db.commit()
+    return db_user
+
+
+async def get_user_by_email(email: str, db: AsyncSession) -> User:
+    """
+    Получает пользователя по email.
+
+    :param email: email пользователя
+    :param db: экземпляр сессии базы данных (типа AsyncSession)
+    :return: пользователь с указанным email (типа User)
+    """
+    result = await db.execute(select(User).filter(User.email == email))
+    db_user = result.scalars().first()
     return db_user
