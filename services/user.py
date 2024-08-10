@@ -1,5 +1,3 @@
-from typing import Sequence
-
 from fastapi import HTTPException
 from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
@@ -82,12 +80,12 @@ async def get_user(user_id: int, db: AsyncSession) -> UserOut:
     return db_user
 
 
-async def get_users(db: AsyncSession) -> Sequence[User]:
+async def get_users(db: AsyncSession) -> [User]:
     """
-    Получает список всех пользователей.
+    Получает всех пользователей.
 
     :param db: экземпляр сессии базы данных (типа AsyncSession)
-    :return: список пользователей (типа List[UserOut])
+    :return: список всех пользователей (типа Sequence[User])
     """
     query = await db.execute(select(User))
     return query.scalars().all()
