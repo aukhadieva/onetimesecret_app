@@ -27,5 +27,8 @@ async def get_db() -> AsyncSession:
     """
     Создает и возвращает экземпляр сессии базы данных.
     """
-    async with AsyncSessionLocal() as session:
-        yield session
+    try:
+        async with AsyncSessionLocal() as session:
+            yield session
+    finally:
+        await session.close()
