@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from fastapi import HTTPException
 from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
@@ -5,7 +7,7 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models.user import User
-from schemas.user import UserCreate, UserUpdate
+from schemas.user import UserCreate, UserUpdate, UserOut
 
 
 def hash_password(password: str) -> str:
@@ -19,7 +21,7 @@ def hash_password(password: str) -> str:
     return pwd_context.hash(password)
 
 
-async def add_user(user: UserCreate, db: AsyncSession):
+async def add_user(user: UserCreate, db: AsyncSession) -> UserOut:
     """
     Добавляет нового пользователя в базу данных.
 
@@ -39,7 +41,7 @@ async def add_user(user: UserCreate, db: AsyncSession):
         raise HTTPException(status_code=409, detail='Пользователь с таким email уже существует')
 
 
-async def update_user(user_id: int, user: UserUpdate, db: AsyncSession):
+async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> UserOut:
     """
     Обновляет информации о пользователе.
 
@@ -65,7 +67,7 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession):
     return db_user
 
 
-async def get_user(user_id: int, db: AsyncSession):
+async def get_user(user_id: int, db: AsyncSession) -> UserOut:
     """
     Получает пользователя по идентификатору.
 
@@ -80,7 +82,7 @@ async def get_user(user_id: int, db: AsyncSession):
     return db_user
 
 
-async def get_users(db: AsyncSession):
+async def get_users(db: AsyncSession) -> Sequence[User]:
     """
     Получает список всех пользователей.
 
@@ -91,7 +93,7 @@ async def get_users(db: AsyncSession):
     return query.scalars().all()
 
 
-async def delete_user(user_id: int, db: AsyncSession):
+async def delete_user(user_id: int, db: AsyncSession) -> UserOut:
     """
     Удаляет пользователя по идентификатору.
 
