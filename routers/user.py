@@ -53,11 +53,12 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db), current_use
 
 
 @router.get('/users/', response_model=List[UserOut])
-async def get_users(db: AsyncSession = Depends(get_db)):
+async def get_users(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Получает список всех пользователей.
 
     :param db: экземпляр сессии базы данных (типа AsyncSession)
+    :param current_user: текущий авторизованный пользователь (типа User)
     :return: список пользователей (типа List[UserOut])
     """
     return await crud.get_users(db)
