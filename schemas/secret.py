@@ -8,21 +8,22 @@ class SecretBase(BaseModel):
     Базовая модель для секретов.
     """
     lifetime: Lifetime
+    secret_content: bytes
 
 
 class SecretCreate(SecretBase):
     """
     Модель для создания секрета.
     """
-    secret_content: str
+    pass
 
 
-class SecretOut(BaseModel):
+class SecretOut(SecretBase):
     """
     Модель для вывода секрета.
     """
     id: int
-    passphrase: str
+    user_id: int
     link: str
 
     class Config:
@@ -31,3 +32,10 @@ class SecretOut(BaseModel):
         Позволяет использовать ORM-объекты для сериализации.
         """
         orm_mode = True
+
+
+class SecretDecryptOut(BaseModel):
+    """
+    Модель для вывода расшифрованного секрета.
+    """
+    secret_content: str
