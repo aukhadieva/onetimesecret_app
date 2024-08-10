@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
 from database.db import create_tables, AsyncSessionLocal
-from routers import user, secret, token
+from routers import user, secret, auth
 
 app = FastAPI()
 

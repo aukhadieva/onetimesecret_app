@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.db import get_db
-from schemas.token import Token
+from schemas.auth import Token
 from schemas.user import UserCreate
 from services import user as crud
-from services.token import create_access_token
+from services.auth import create_access_token
 
 load_dotenv()
 
