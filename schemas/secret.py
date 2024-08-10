@@ -9,6 +9,7 @@ class SecretBase(BaseModel):
     """
     lifetime: Lifetime
     secret_content: bytes
+    passphrase: bytes
 
 
 class SecretCreate(SecretBase):
@@ -24,7 +25,6 @@ class SecretOut(SecretBase):
     """
     id: int
     user_id: int
-    link: str
 
     class Config:
         """
@@ -39,3 +39,10 @@ class SecretDecryptOut(BaseModel):
     Модель для вывода расшифрованного секрета.
     """
     secret_content: str
+
+
+class SecretKeyOut(BaseModel):
+    """
+    Модель для вывода секретного ключа.
+    """
+    passphrase: bytes
