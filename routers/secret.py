@@ -7,7 +7,7 @@ from database.db import get_db
 from models.user import User
 from schemas.secret import SecretOut, SecretCreate, SecretDecryptOut, SecretKeyOut
 from services import secret as crud
-from services.token import get_current_user
+from services.auth import get_current_user
 
 router = APIRouter()
 
