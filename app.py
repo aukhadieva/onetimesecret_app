@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from config.middleware import LogMiddleware
 from database.db import create_tables, AsyncSessionLocal
 from routers import user, secret, token
 
 app = FastAPI()
 
-app.add_middleware(LogMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from sqlalchemy import Column, Integer, String, Enum as EnumType, ForeignKey, LargeBinary
+from sqlalchemy import Column, Integer, Enum as EnumType, ForeignKey, LargeBinary
 from sqlalchemy.orm import relationship
 
 from database.db import Base
@@ -25,8 +25,8 @@ class Secret(Base):
     __tablename__ = 'secrets'
     id = Column(Integer, primary_key=True, index=True)
     secret_content = Column(LargeBinary, nullable=False)
+    passphrase = Column(LargeBinary, nullable=False)
     lifetime = Column(EnumType(Lifetime), nullable=False)
-    link = Column(String, nullable=False)
 
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='secrets')
