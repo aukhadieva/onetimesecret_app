@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from database.db import create_tables, AsyncSessionLocal
+from database.db import create_tables, engine
 from routers import user, secret, auth
 
 app = FastAPI()
@@ -16,7 +16,7 @@ app.add_middleware(
 
 app.include_router(user.router)
 app.include_router(secret.router)
-app.include_router(token.router)
+app.include_router(auth.router)
 
 
 @app.on_event('startup')
@@ -34,4 +34,4 @@ async def shutdown_event():
     Закрывает соединение с базой данных при завершении работы приложения.
     :return:
     """
-    await AsyncSessionLocal.close()
+    await engine.dispose()
