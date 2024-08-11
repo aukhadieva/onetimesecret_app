@@ -16,12 +16,16 @@ router = APIRouter()
 async def generate_secret(secret: SecretCreate, db: AsyncSession = Depends(get_db),
                           current_user: User = Depends(get_current_user)):
     """
-    Генерирует новый секрет и сохраняет его в базе данных.
+    Generates a new secret key.
 
-    :param secret: объект с данными о новом секрете (типа SecretCreate)
-    :param db: экземпляр сессии базы данных (типа AsyncSession)
-    :param current_user: текущий авторизованный пользователь (типа User)
-    :return: ключ секрета (типа SecretKeyOut)
+    This endpoint allows the authenticated user to create a new secret key
+    based on the provided secret information. It returns the generated secret
+    key information upon successful creation.
+
+    :param secret: The data containing the details for the new secret key.
+    :param db: The database session dependency for performing the secret generation.
+    :param current_user: The currently authenticated user, used for associating the secret.
+    :return: The generated secret key information as an instance of SecretKeyOut.
     """
     return await crud.generate_secret(secret, current_user.id, db)
 
@@ -30,12 +34,16 @@ async def generate_secret(secret: SecretCreate, db: AsyncSession = Depends(get_d
 async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
                      current_user: User = Depends(get_current_user)):
     """
-    Получает секрет по зашифрованному ключу.
+    Retrieves and decrypts a specified secret key.
 
-    :param secret_key: зашифрованный ключ секрета (типа bytes)
-    :param db: экземпляр сессии базы данных (типа AsyncSession)
-    :param current_user: текущий авторизованный пользователь (типа User)
-    :return: расшифрованный секрет (типа SecretDecryptOut)
+    This endpoint allows the authenticated user to access and decrypt a secret
+    associated with the provided secret key. It returns the decrypted secret information
+    upon successful retrieval.
+
+    :param secret_key: The secret key to be retrieved and decrypted.
+    :param db: The database session dependency for accessing secret data.
+    :param current_user: The currently authenticated user, used for permission checks.
+    :return: The decrypted secret information as an instance of SecretDecryptOut.
     """
     return await crud.get_secret(secret_key, current_user.id, db)
 
@@ -43,10 +51,13 @@ async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
 @router.get('/secrets/', response_model=List[SecretOut])
 async def get_secrets(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
-    Получает список всех секретов.
+    Retrieves a list of all secrets associated with the authenticated user.
 
-    :param db: экземпляр сессии базы данных (типа AsyncSession)
-    :param current_user: текущий авторизованный пользователь (типа User)
-    :return: список секретов (типа List[SecretOut])
+    This endpoint returns the secrets that belong to the currently authenticated user,
+    ensuring that users can only access their own secrets.
+
+    :param db: The database session dependency for accessing secret data.
+    :param current_user: The currently authenticated user, used for filtering secrets.
+    :return: A list of secret information as instances of SecretOut.
     """
     return await crud.get_secrets(current_user.id, db)
