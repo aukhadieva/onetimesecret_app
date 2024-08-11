@@ -36,7 +36,7 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession = Depends
     :param current_user: текущий авторизованный пользователь (типа User)
     :return: обновленный пользователь (типа UserOut)
     """
-    return await crud.update_user(user_id, user, db)
+    return await crud.update_user(user_id, current_user.id, user, db)
 
 
 @router.get('/users/{user_id}', response_model=UserOut)
@@ -74,4 +74,4 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), current_
     :param current_user: текущий авторизованный пользователь (типа User)
     :return: удаленный пользователь (типа UserOut)
     """
-    return await crud.delete_user(user_id, db)
+    return await crud.delete_user(user_id, current_user.id, db)
