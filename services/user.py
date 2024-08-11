@@ -39,10 +39,11 @@ async def add_user(user: UserCreate, db: AsyncSession) -> UserOut:
         raise HTTPException(status_code=409, detail='Пользователь с таким email уже существует')
 
 
-async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> UserOut:
+async def update_user(user_id: int, current_user_id: int, user: UserUpdate, db: AsyncSession) -> UserOut:
     """
     Обновляет информации о пользователе.
 
+    :param current_user_id: идентификатор текущего авторизованного пользователя (тип int)
     :param user_id: идентификатор пользователя (тип int)
     :param user: объект, содержащий данные о пользователе для обновления (тип UserUpdate)
     :param db: экземпляр сессии базы данных (тип AsyncSession)
@@ -50,8 +51,8 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession) -> UserO
     """
     query = await db.execute(select(User).where(User.id == user_id))
     db_user = query.scalars().first()
-    if db_user is None:
-        raise HTTPException(status_code=404, detail='Пользователь не найден')
+    if db_user is None or user_id != current_user_id:
+        raise HTTPException(status_code=404, detail='Пользователь не найден или отсутствуют права')
 
     if user.password is not None and user.password != db_user.password:
         db_user.password = hash_password(user.password)
@@ -91,18 +92,19 @@ async def get_users(db: AsyncSession) -> [User]:
     return query.scalars().all()
 
 
-async def delete_user(user_id: int, db: AsyncSession) -> UserOut:
+async def delete_user(user_id: int, current_user_id: int, db: AsyncSession) -> UserOut:
     """
     Удаляет пользователя по идентификатору.
 
+    :param current_user_id: идентификатор текущего авторизованного пользователя (тип int)
     :param user_id: идентификатор пользователя (тип int)
     :param db: экземпляр сессии базы данных (тип AsyncSession)
     :return: удаленный пользователь (тип UserOut)
     """
     query = await db.execute(select(User).where(User.id == user_id))
     db_user = query.scalars().first()
-    if db_user is None:
-        raise HTTPException(status_code=404, detail='Пользователь не найден')
+    if db_user is None or user_id != current_user_id:
+        raise HTTPException(status_code=404, detail='Пользователь не найден или отсутствуют права')
     await db.delete(db_user)
     await db.commit()
     return db_user
