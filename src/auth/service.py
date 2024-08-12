@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import SECRET_JWT_KEY, JWT_ALGORITHM
 from src.database import get_db
-from src.models import User
+from src.user.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 

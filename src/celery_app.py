@@ -1,7 +1,7 @@
 from celery import Celery
 
 from src.config import CELERY_BROKER_URL, CELERY_BACKEND_URL
-from tasks.tasks import burn_secret
+from tasks.tasks import burn_secret    # noqa
 
 
 def make_celery():

@@ -1,12 +1,10 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
 from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.service import get_current_user
 from src.database import get_db
-from src.models import User
+from src.user.models import User
 from src.user.schemas import UserOut, UserCreate, UserUpdate
 from src.user import service
 

@@ -7,7 +7,7 @@ from src.auth.schemas import Token, RefreshToken
 from src.auth.service import authenticate_user, get_user, create_refresh_token, create_access_token, validate_token
 from src.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES
 from src.database import get_db
-from src.models import User
+from src.user.models import User
 from src.user.schemas import UserCreate
 
 router = APIRouter()
