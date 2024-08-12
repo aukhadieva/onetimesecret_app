@@ -16,13 +16,18 @@ router = APIRouter()
 @router.post('/login', response_model=Token)
 async def login_for_access_token(form_data: UserCreate, db: AsyncSession = Depends(get_db)):
     """
-    Аутентифицирует пользователя по email и паролю.
+    Authenticates a user and generates access and refresh tokens.
 
-    :param form_data: объект, содержащий данные для аутентификации (тип UserCreate)
-    :param db: экземпляр сессии базы данных (тип AsyncSession)
-    :return: JWT токен и его тип
+    This endpoint allows a user to log in by providing their email and password.
+    If the credentials are valid, it returns an access token for authentication
+    and a refresh token for obtaining new access tokens when the current one expires.
+
+    :param form_data: The data containing the user's email and password.
+    :param db: The database session dependency for user authentication.
+    :return: A dictionary containing the generated access token, refresh token, and the token type (bearer).
+    :raises HTTPException: If authentication fails, a 401 error will be raised
+    with a message indicating incorrect credentials.
     """
-    # user = await get_user(form_data.email, db)
     user = await authenticate_user(get_user, form_data.email, form_data.password, db)
     if not user or not isinstance(user, User):
         raise HTTPException(
@@ -45,11 +50,16 @@ async def login_for_access_token(form_data: UserCreate, db: AsyncSession = Depen
 @router.post('/refresh_token', response_model=Token)
 async def refresh_token(form_data: RefreshToken, db: AsyncSession = Depends(get_db)):
     """
-    Обновляет JWT токен при помощи refresh токена.
+    Refreshes the access and refresh tokens for a user.
 
-    :param form_data: объект, содержащий refresh токен (тип RefreshToken)
-    :param db: экземпляр сессии базы данных (тип AsyncSession)
-    :return: новый JWT токен и его тип
+    This endpoint accepts a refresh token and generates a new access token
+    and refresh token for the user. The access token allows the user to
+    access protected resources, while the refresh token can be used to
+    obtain new access tokens when the current one expires.
+
+    :param form_data: The data containing the refresh token.
+    :param db: The database session dependency for accessing user data.
+    :return: A dictionary containing the new access token, refresh token, and the token type (bearer).
     """
     user = await validate_token(db, token=form_data.refresh_token)
 

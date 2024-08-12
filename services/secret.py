@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from cryptography.fernet import Fernet
 from fastapi import HTTPException
 from sqlalchemy.future import select
@@ -22,7 +24,9 @@ async def generate_secret(secret: SecretCreate, user_id: int, db: AsyncSession) 
     """
     secret_content = cipher_suite.encrypt(secret.secret_content)
     passphrase = cipher_suite.encrypt(secret.passphrase)
-    db_secret = Secret(secret_content=secret_content, lifetime=secret.lifetime, passphrase=passphrase, user_id=user_id)
+    created_at = datetime.utcnow()
+    db_secret = Secret(secret_content=secret_content, lifetime=secret.lifetime, passphrase=passphrase, user_id=user_id,
+                       created_at=created_at)
     db.add(db_secret)
     await db.commit()
     return SecretKeyOut(passphrase=passphrase)
@@ -37,8 +41,7 @@ async def get_secret(secret_key: bytes, user_id: int, db: AsyncSession) -> Secre
     :param db: экземпляр сессии базы данных (типа AsyncSession)
     :return: расшифрованный секрет (типа SecretDecryptOut)
     """
-    query = await db.execute(select(Secret).where(Secret.passphrase == secret_key,
-                                                  Secret.user_id == user_id))
+    query = await db.execute(select(Secret).where((Secret.passphrase == secret_key) & (Secret.user_id == user_id)))
     db_secret = query.scalars().first()
     if db_secret is None:
         raise HTTPException(status_code=404, detail='Секрет не найден')

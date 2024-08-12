@@ -20,6 +20,10 @@ bcrypt = "^4.2.0"
 pyjwt = "^2.9.0"
 python-multipart = "^0.0.9"
 cryptography = "^43.0.0"
+celery = "^5.4.0"
+redis = "^5.0.8"
+flower = "^2.0.1"
+python-dateutil = "^2.9.0.post0"
 
 
 [build-system]
