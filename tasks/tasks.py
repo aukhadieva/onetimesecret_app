@@ -16,7 +16,7 @@ async def burn_secret_async():
     async with AsyncSessionLocal() as session:
         current_datetime = datetime.utcnow()
 
-        burn_time_5_minutes = current_datetime - relativedelta(minutes=1)
+        burn_time_5_minutes = current_datetime - relativedelta(minutes=5)
         burn_time_1_hour = current_datetime - relativedelta(hours=1)
         burn_twelve_hours = current_datetime - relativedelta(hours=12)
         burn_one_day = current_datetime - relativedelta(days=1)
