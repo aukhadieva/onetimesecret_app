@@ -1,11 +1,17 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, LargeBinary, DateTime,  Enum as EnumType
-from sqlalchemy.orm import relationship
 from enum import Enum
+
+from sqlalchemy import Column, Integer, Enum as EnumType, ForeignKey, LargeBinary, DateTime
+from sqlalchemy.orm import relationship
 
 from src.database import Base
 
+from src.user.models import User  # noqa
+
 
 class Lifetime(str, Enum):
+    """
+    Срок жизни секрета.
+    """
     five_min = '5 минут'
     one_hour = '1 час'
     twelve_hours = '12 часов'
@@ -14,20 +20,16 @@ class Lifetime(str, Enum):
     fourteen_days = '14 дней'
 
 
-class User(Base):
-    __tablename__ = 'users'
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, nullable=False)
-    password = Column(String, nullable=False)
-    secrets = relationship("Secret", back_populates='user')
-
-
 class Secret(Base):
+    """
+    Модель для описания секретов.
+    """
     __tablename__ = 'secrets'
     id = Column(Integer, primary_key=True, index=True)
     secret_content = Column(LargeBinary, nullable=False)
     passphrase = Column(LargeBinary, nullable=False)
     lifetime = Column(EnumType(Lifetime), nullable=False)
     created_at = Column(DateTime, nullable=False)
+
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship('User', back_populates='secrets')
