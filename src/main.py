@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
 
-from database.db import create_tables, engine
-from routers import user, secret, auth
+from src.secret import router as secret_router
+from src.user import router as user_router
+from src.auth import router as auth_router
+
+from src.database import create_tables, engine
 
 app = FastAPI()
 
@@ -14,9 +17,9 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-app.include_router(user.router)
-app.include_router(secret.router)
-app.include_router(auth.router)
+app.include_router(user_router.router)
+app.include_router(secret_router.router)
+app.include_router(auth_router.router)
 
 
 @app.on_event('startup')

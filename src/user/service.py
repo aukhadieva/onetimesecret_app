@@ -4,8 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.user import User
-from schemas.user import UserCreate, UserUpdate, UserOut
+from src.models import User
+from src.user.schemas import UserCreate, UserOut, UserUpdate
 
 
 def hash_password(password: str) -> str:

@@ -5,8 +5,8 @@ from fastapi import HTTPException
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from models.secret import Secret
-from schemas.secret import SecretCreate, SecretOut, SecretDecryptOut, SecretKeyOut
+from src.models import Secret
+from src.secret.schemas import SecretCreate, SecretKeyOut, SecretDecryptOut, SecretOut
 
 # генерация ключа
 key = Fernet.generate_key()

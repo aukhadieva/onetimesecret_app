@@ -3,11 +3,11 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.db import get_db
-from models.user import User
-from schemas.secret import SecretOut, SecretCreate, SecretDecryptOut, SecretKeyOut
-from services import secret as crud
-from services.auth import get_current_user
+from src.auth.service import get_current_user
+from src.database import get_db
+from src.models import User
+from src.secret.schemas import SecretKeyOut, SecretCreate, SecretDecryptOut, SecretOut
+from src.secret import service
 
 router = APIRouter()
 
@@ -27,7 +27,7 @@ async def generate_secret(secret: SecretCreate, db: AsyncSession = Depends(get_d
     :param current_user: The currently authenticated user, used for associating the secret.
     :return: The generated secret key information as an instance of SecretKeyOut.
     """
-    return await crud.generate_secret(secret, current_user.id, db)
+    return await service.generate_secret(secret, current_user.id, db)
 
 
 @router.get('/secrets/{secret_key}', response_model=SecretDecryptOut)
@@ -45,7 +45,7 @@ async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
     :param current_user: The currently authenticated user, used for permission checks.
     :return: The decrypted secret information as an instance of SecretDecryptOut.
     """
-    return await crud.get_secret(secret_key, current_user.id, db)
+    return await service.get_secret(secret_key, current_user.id, db)
 
 
 @router.get('/secrets/', response_model=List[SecretOut])
@@ -60,4 +60,4 @@ async def get_secrets(db: AsyncSession = Depends(get_db), current_user: User = D
     :param current_user: The currently authenticated user, used for filtering secrets.
     :return: A list of secret information as instances of SecretOut.
     """
-    return await crud.get_secrets(current_user.id, db)
+    return await service.get_secrets(current_user.id, db)

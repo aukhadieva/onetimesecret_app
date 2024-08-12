@@ -3,11 +3,11 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.db import get_db
-from models.user import User
-from schemas.user import UserCreate, UserUpdate, UserOut
-from services import user as crud
-from services.auth import get_current_user
+from src.auth.service import get_current_user
+from src.database import get_db
+from src.models import User
+from src.user.schemas import UserOut, UserCreate, UserUpdate
+from src.user import service
 
 router = APIRouter()
 
@@ -24,7 +24,7 @@ async def add_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     :param db: The database session dependency for performing the user creation.
     :return: The created user information as an instance of UserOut.
     """
-    return await crud.add_user(user, db)
+    return await service.add_user(user, db)
 
 
 @router.put('/users/{user_id}', response_model=UserOut)
@@ -42,7 +42,7 @@ async def update_user(user_id: int, user: UserUpdate, db: AsyncSession = Depends
     :param current_user: The currently authenticated user, used for permission checks.
     :return: The updated user information as an instance of UserOut.
     """
-    return await crud.update_user(user_id, current_user.id, user, db)
+    return await service.update_user(user_id, current_user.id, user, db)
 
 
 @router.get('/users/{user_id}', response_model=UserOut)
@@ -59,7 +59,7 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db), current_use
     :param current_user: The currently authenticated user, used for permission checks.
     :return: The requested user's information as an instance of UserOut.
     """
-    return await crud.get_user(user_id, db)
+    return await service.get_user(user_id, db)
 
 
 @router.get('/users/', response_model=List[UserOut])
@@ -75,7 +75,7 @@ async def get_users(db: AsyncSession = Depends(get_db), current_user: User = Dep
     :param current_user: The currently authenticated user, used for permission checks.
     :return: A list of user information as instances of UserOut.
     """
-    return await crud.get_users(db)
+    return await service.get_users(db)
 
 
 @router.delete('/users/{user_id}', response_model=UserOut)
@@ -91,4 +91,4 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), current_
     :param current_user: The currently authenticated user, used for permission checks.
     :return: The deleted user's information as an instance of UserOut.
     """
-    return await crud.delete_user(user_id, current_user.id, db)
+    return await service.delete_user(user_id, current_user.id, db)
