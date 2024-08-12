@@ -3,12 +3,12 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.db import get_db
-from models.user import User
-from schemas.auth import Token, RefreshToken
-from schemas.user import UserCreate
-from services.auth import create_access_token, create_refresh_token, validate_token, get_user, authenticate_user
-from settings import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES
+from src.auth.schemas import Token, RefreshToken
+from src.auth.service import authenticate_user, get_user, create_refresh_token, create_access_token, validate_token
+from src.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES
+from src.database import get_db
+from src.models import User
+from src.user.schemas import UserCreate
 
 router = APIRouter()
 

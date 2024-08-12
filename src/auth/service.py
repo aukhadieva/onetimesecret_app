@@ -8,9 +8,9 @@ from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.db import get_db
-from models.user import User
-from settings import SECRET_JWT_KEY, JWT_ALGORITHM
+from src.config import SECRET_JWT_KEY, JWT_ALGORITHM
+from src.database import get_db
+from src.models import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 

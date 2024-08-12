@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from models.secret import Lifetime
+from src.models import Lifetime
 
 
 class SecretBase(BaseModel):
