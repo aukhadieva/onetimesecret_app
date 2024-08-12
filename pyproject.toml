@@ -24,6 +24,7 @@ redis = "^5.0.8"
 flower = "^2.0.1"
 python-dateutil = "^2.9.0.post0"
 bcrypt = "^4.2.0"
+fastapi-pagination = "^0.12.26"
 
 
 [build-system]
