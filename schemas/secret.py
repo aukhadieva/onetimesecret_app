@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 from models.secret import Lifetime
@@ -25,6 +27,7 @@ class SecretOut(SecretBase):
     """
     id: int
     user_id: int
+    created_at: datetime
 
     class Config:
         """
