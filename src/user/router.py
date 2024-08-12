@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.service import get_current_user
@@ -62,7 +63,7 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db), current_use
     return await service.get_user(user_id, db)
 
 
-@router.get('/users/', response_model=List[UserOut])
+@router.get('/users/', response_model=Page[UserOut])
 async def get_users(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Retrieves a list of all users.

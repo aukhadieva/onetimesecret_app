@@ -2,6 +2,8 @@ from datetime import datetime
 
 from cryptography.fernet import Fernet
 from fastapi import HTTPException
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -53,13 +55,14 @@ async def get_secret(secret_key: bytes, user_id: int, db: AsyncSession) -> Secre
     return SecretDecryptOut(secret_content=decrypted_secret)
 
 
-async def get_secrets(user_id: int, db: AsyncSession) -> [SecretOut]:
+async def get_secrets(user_id: int, db: AsyncSession) -> Page[SecretOut]:
     """
-    Получает список всех секретов.
+    Получает список всех секретов (отфильтрованных по убыванию даты создания).
+    Список выводится с возможностью пагинации (50 объектов на странице).
 
     :param user_id: идентификатор пользователя (типа int)
     :param db: экземпляр сессии базы данных (типа AsyncSession)
     :return: список секретов (типа Sequence[SecretOut])
     """
-    query = await db.execute(select(Secret).where(Secret.user_id == user_id))
-    return query.scalars().all()
+    query = select(Secret).where(Secret.user_id == user_id).order_by(Secret.created_at.desc())
+    return await paginate(db, query)

@@ -1,6 +1,5 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
+from fastapi_pagination import Page
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.service import get_current_user
@@ -48,7 +47,7 @@ async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
     return await service.get_secret(secret_key, current_user.id, db)
 
 
-@router.get('/secrets/', response_model=List[SecretOut])
+@router.get('/secrets/', response_model=Page[SecretOut])
 async def get_secrets(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Retrieves a list of all secrets associated with the authenticated user.

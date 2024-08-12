@@ -1,4 +1,6 @@
 from fastapi import HTTPException
+from fastapi_pagination import Page
+from fastapi_pagination.ext.sqlalchemy import paginate
 from passlib.context import CryptContext
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
@@ -81,15 +83,16 @@ async def get_user(user_id: int, db: AsyncSession) -> UserOut:
     return db_user
 
 
-async def get_users(db: AsyncSession) -> [User]:
+async def get_users(db: AsyncSession) -> Page[UserOut]:
     """
-    Получает всех пользователей.
+    Получает список всех пользователей.
+    Список выводится с возможностью пагинации (50 объектов на странице).
 
     :param db: экземпляр сессии базы данных (тип AsyncSession)
     :return: список всех пользователей (тип Sequence[User])
     """
-    query = await db.execute(select(User))
-    return query.scalars().all()
+    query = select(User)
+    return await paginate(db, query)
 
 
 async def delete_user(user_id: int, current_user_id: int, db: AsyncSession) -> UserOut:
