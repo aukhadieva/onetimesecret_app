@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy import select
 
 from src.database import AsyncSessionLocal
-from src.models import Secret
+from src.secret.models import Secret
 
 
 async def burn_secret_async():

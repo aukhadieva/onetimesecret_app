@@ -2,7 +2,7 @@
 name = "onetimesecret-app"
 version = "0.1.0"
 description = ""
-authors = ["Olga Aukhadieva <sarole4ka@gmail.com>"]
+authors = ["Olga Aukhadieva <olya.aukhadieva@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -25,6 +25,8 @@ flower = "^2.0.1"
 python-dateutil = "^2.9.0.post0"
 bcrypt = "^4.2.0"
 fastapi-pagination = "^0.12.26"
+pytest = "^8.3.2"
+alembic = "^1.13.2"
 
 
 [build-system]
