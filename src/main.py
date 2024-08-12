@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi_pagination import add_pagination
 from starlette.middleware.cors import CORSMiddleware
 
 from src.secret import router as secret_router
@@ -8,6 +9,8 @@ from src.auth import router as auth_router
 from src.database import create_tables, engine
 
 app = FastAPI()
+
+add_pagination(app)
 
 app.add_middleware(
     CORSMiddleware,
