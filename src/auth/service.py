@@ -32,7 +32,7 @@ def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
         to_encode.update({'exp': expire})
         encoded_jwt = jwt.encode(to_encode, SECRET_JWT_KEY, algorithm=JWT_ALGORITHM)
         return encoded_jwt
-    except Exception as error:
+    except Exception:
         raise HTTPException(status_code=500, detail='Ошибка при создании токена')
 
 
@@ -53,7 +53,7 @@ def create_refresh_token(data: dict, expires_delta: timedelta = None) -> str:
         to_encode.update({'exp': expire})
         encoded_jwt = jwt.encode(to_encode, SECRET_JWT_KEY, algorithm=JWT_ALGORITHM)
         return encoded_jwt
-    except Exception as error:
+    except Exception:
         raise HTTPException(status_code=500, detail='Ошибка при создании токена')
 
 

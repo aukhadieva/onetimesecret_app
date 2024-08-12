@@ -34,7 +34,7 @@ async def add_user(user: UserCreate, db: AsyncSession) -> UserOut:
         await db.commit()
         await db.refresh(db_user)
         return db_user
-    except IntegrityError as error:
+    except IntegrityError:
         await db.rollback()
         raise HTTPException(status_code=409, detail='Пользователь с таким email уже существует')
 
