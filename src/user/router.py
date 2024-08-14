@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from fastapi_pagination import Page
+from fastapi import APIRouter, Depends, Query
+from fastapi_pagination import Page, Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.service import get_current_user
@@ -11,7 +11,7 @@ from src.user import service
 router = APIRouter()
 
 
-@router.post('/users/', response_model=UserOut)
+@router.post('/users/', response_model=UserOut, status_code=201)
 async def add_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     Adds a new user to the database.
@@ -62,19 +62,22 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db), current_use
 
 
 @router.get('/users/', response_model=Page[UserOut])
-async def get_users(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def get_users(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user),
+                    page: int = Query(1, gt=0), size: int = Query(50, gt=0)):
     """
-    Retrieves a list of all users.
+    Retrieve a paginated list of users.
 
-    This endpoint returns a list of user details. Access to this endpoint
-    is restricted to authenticated users, ensuring that only authorized
-    users can view the list of users.
+    This endpoint fetches a list of users from the database, allowing for pagination through the
+    page and size parameters.
 
-    :param db: The database session dependency for accessing user data.
-    :param current_user: The currently authenticated user, used for permission checks.
-    :return: A list of user information as instances of UserOut.
+    :param db: The database session to execute the query.
+    :param current_user: The currently authenticated user making the request.
+    :param page: The page number to retrieve (default is 1). Must be greater than 0.
+    :param size: The number of users to return per page (default is 10). Must be greater than 0.
+    :return: A paginated response model containing the list of users.
     """
-    return await service.get_users(db)
+    params = Params(page=page, size=size)
+    return await service.get_users(db, params)
 
 
 @router.delete('/users/{user_id}', response_model=UserOut)
