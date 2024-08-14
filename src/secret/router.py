@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from fastapi_pagination import Page
+from fastapi import APIRouter, Depends, Query
+from fastapi_pagination import Page, Params
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.service import get_current_user
@@ -11,7 +11,7 @@ from src.user.models import User
 router = APIRouter()
 
 
-@router.post('/generate/', response_model=SecretKeyOut)
+@router.post('/generate/', response_model=SecretKeyOut, status_code=201)
 async def generate_secret(secret: SecretCreate, db: AsyncSession = Depends(get_db),
                           current_user: User = Depends(get_current_user)):
     """
@@ -48,15 +48,20 @@ async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
 
 
 @router.get('/secrets/', response_model=Page[SecretOut])
-async def get_secrets(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def get_secrets(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user),
+                      page: int = Query(1, gt=0), size: int = Query(50, gt=0)):
     """
-    Retrieves a list of all secrets associated with the authenticated user.
+    Retrieve a paginated list of secrets for the current user.
 
-    This endpoint returns the secrets that belong to the currently authenticated user,
-    ensuring that users can only access their own secrets.
+    This endpoint allows the current user to access their secrets, with pagination
+    support to limit the number of results returned.
 
-    :param db: The database session dependency for accessing secret data.
-    :param current_user: The currently authenticated user, used for filtering secrets.
-    :return: A list of secret information as instances of SecretOut.
+    :param db: The database session to use for retrieving secrets. This is provided automatically
+    by a dependency injection system.
+    :param current_user: The user requesting the secrets. This is obtained from the authentication context.
+    :param page: The page number to retrieve. Defaults to 1. Should be greater than 0.
+    :param size: The number of secrets to return per page. Defaults to 10. Should be greater than 0.
+    :return: A paginated response containing the secrets for the user, formatted according to the SecretOut model.
     """
-    return await service.get_secrets(current_user.id, db)
+    params = Params(page=page, size=size)
+    return await service.get_secrets(current_user.id, db, params)
