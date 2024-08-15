@@ -1,4 +1,5 @@
 import asyncio
+from typing import AsyncGenerator
 
 import pytest
 from httpx import AsyncClient
@@ -18,7 +19,7 @@ AsyncSessionLocal = sessionmaker(bind=engine_test, class_=AsyncSession, expire_o
 Base.metadata.bind = engine_test
 
 
-async def override_get_db() -> AsyncSession:
+async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Создает и возвращает экземпляр сессии тестовой базы данных.
     """
@@ -27,7 +28,7 @@ async def override_get_db() -> AsyncSession:
 
 
 @pytest.fixture(autouse=True, scope='function')
-async def prepare_database():
+async def prepare_database() -> None:
     """
     Подключается к тестовой базе данных и создает таблицы,
     определенные в моделях, наследующихся от класса Base.
@@ -42,7 +43,7 @@ async def prepare_database():
 
 
 @pytest.fixture(scope='function')
-async def async_client() -> AsyncClient:
+async def async_client() -> AsyncGenerator[AsyncClient, None]:
     """
     Создает и возвращает асинхронный клиент для тестирования API.
     :return:
@@ -53,7 +54,7 @@ async def async_client() -> AsyncClient:
 
 
 @pytest.fixture(scope='session')
-def event_loop():
+def event_loop() -> AsyncGenerator[asyncio.AbstractEventLoop, None]:
     """
     Создает и возвращает новый цикл событий для тестирования.
     :return:
