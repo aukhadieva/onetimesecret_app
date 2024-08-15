@@ -19,6 +19,6 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-app.include_router(user_router.router)
-app.include_router(secret_router.router)
-app.include_router(auth_router.router)
+app.include_router(user_router.router, prefix='/api', tags=['user'])
+app.include_router(secret_router.router, prefix='/api', tags=['secret'])
+app.include_router(auth_router.router, prefix='/api/auth', tags=['auth'])
