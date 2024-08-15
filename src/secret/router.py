@@ -11,16 +11,13 @@ from src.user.models import User
 router = APIRouter()
 
 
-@router.post('/generate/', response_model=SecretKeyOut, status_code=201)
+@router.post('/generate/', response_model=SecretKeyOut, status_code=201, summary='Generates a new secret key.',
+             description='This endpoint allows the authenticated user to create a new secret key based '
+                         'on the provided secret information. '
+                         'It returns the generated secret key information upon successful creation.')
 async def generate_secret(secret: SecretCreate, db: AsyncSession = Depends(get_db),
                           current_user: User = Depends(get_current_user)):
     """
-    Generates a new secret key.
-
-    This endpoint allows the authenticated user to create a new secret key
-    based on the provided secret information. It returns the generated secret
-    key information upon successful creation.
-
     :param secret: The data containing the details for the new secret key.
     :param db: The database session dependency for performing the secret generation.
     :param current_user: The currently authenticated user, used for associating the secret.
@@ -29,16 +26,14 @@ async def generate_secret(secret: SecretCreate, db: AsyncSession = Depends(get_d
     return await service.generate_secret(secret, current_user.id, db)
 
 
-@router.get('/secrets/{secret_key}', response_model=SecretDecryptOut)
+@router.get('/secrets/{secret_key}', response_model=SecretDecryptOut,
+            summary='Retrieves and decrypts a specified secret key.',
+            description='This endpoint allows the authenticated user to access and decrypt a secret associated '
+                        'with the provided secret key. '
+                        'It returns the decrypted secret information upon successful retrieval.')
 async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
                      current_user: User = Depends(get_current_user)):
     """
-    Retrieves and decrypts a specified secret key.
-
-    This endpoint allows the authenticated user to access and decrypt a secret
-    associated with the provided secret key. It returns the decrypted secret information
-    upon successful retrieval.
-
     :param secret_key: The secret key to be retrieved and decrypted.
     :param db: The database session dependency for accessing secret data.
     :param current_user: The currently authenticated user, used for permission checks.
@@ -47,15 +42,13 @@ async def get_secret(secret_key: bytes, db: AsyncSession = Depends(get_db),
     return await service.get_secret(secret_key, current_user.id, db)
 
 
-@router.get('/secrets/', response_model=Page[SecretOut])
+@router.get('/secrets/', response_model=Page[SecretOut],
+            summary='Retrieve a paginated list of secrets for the current user.',
+            description='This endpoint allows the current user to access their secrets, '
+                        'with pagination support to limit the number of results returned.')
 async def get_secrets(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user),
                       page: int = Query(1, gt=0), size: int = Query(50, gt=0)):
     """
-    Retrieve a paginated list of secrets for the current user.
-
-    This endpoint allows the current user to access their secrets, with pagination
-    support to limit the number of results returned.
-
     :param db: The database session to use for retrieving secrets. This is provided automatically
     by a dependency injection system.
     :param current_user: The user requesting the secrets. This is obtained from the authentication context.

@@ -13,15 +13,13 @@ from src.user.schemas import UserCreate
 router = APIRouter()
 
 
-@router.post('/login', response_model=Token)
+@router.post('/login', response_model=Token,
+             summary='Authenticates a user and generates access and refresh tokens.',
+             description='This endpoint allows a user to log in by providing their email and password. '
+                         'If the credentials are valid, it returns an access token for authentication and '
+                         'a refresh token for obtaining new access tokens when the current one expires.')
 async def login_for_access_token(form_data: UserCreate, db: AsyncSession = Depends(get_db)):
     """
-    Authenticates a user and generates access and refresh tokens.
-
-    This endpoint allows a user to log in by providing their email and password.
-    If the credentials are valid, it returns an access token for authentication
-    and a refresh token for obtaining new access tokens when the current one expires.
-
     :param form_data: The data containing the user's email and password.
     :param db: The database session dependency for user authentication.
     :return: A dictionary containing the generated access token, refresh token, and the token type (bearer).
@@ -47,16 +45,12 @@ async def login_for_access_token(form_data: UserCreate, db: AsyncSession = Depen
     }
 
 
-@router.post('/refresh_token', response_model=Token)
+@router.post('/refresh_token', response_model=Token, summary='Refreshes the access and refresh tokens for a user.',
+             description='This endpoint accepts a refresh token and generates a new access token and refresh token '
+                         'for the user. The access token allows the user to access protected resources, while the '
+                         'refresh token can be used to obtain new access tokens when the current one expires.')
 async def refresh_token(form_data: RefreshToken, db: AsyncSession = Depends(get_db)):
     """
-    Refreshes the access and refresh tokens for a user.
-
-    This endpoint accepts a refresh token and generates a new access token
-    and refresh token for the user. The access token allows the user to
-    access protected resources, while the refresh token can be used to
-    obtain new access tokens when the current one expires.
-
     :param form_data: The data containing the refresh token.
     :param db: The database session dependency for accessing user data.
     :return: A dictionary containing the new access token, refresh token, and the token type (bearer).
