@@ -1,0 +1,82 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: on-failure
+    env_file:
+      - .env
+    expose:
+      - '5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ 'CMD-SHELL', '-c', 'pg_isready -U $POSTGRES_USER' ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  app:
+    build: .
+    tty: true
+    env_file:
+      - .env
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+    command: sh -c 'alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload && redis-server'
+    depends_on:
+      db:
+        condition: service_healthy
+
+  redis:
+    image: redis:latest
+    restart: on-failure
+    expose:
+      - '6379'
+
+  celery:
+    build: .
+    restart: on-failure
+    env_file:
+      - .env
+    tty: true
+    volumes:
+      - .:/app
+    command: celery -A src.celery_app worker -l INFO
+    depends_on:
+      - redis
+      - app
+      - db
+
+  celery-beat:
+    build: .
+    restart: on-failure
+    env_file:
+      - .env
+    tty: true
+    volumes:
+      - .:/app
+    command: celery -A src.celery_app beat -l INFO
+    depends_on:
+      - redis
+      - app
+      - db
+
+  celery-flower:
+    build: .
+    restart: on-failure
+    env_file:
+      - .env
+    tty: true
+    volumes:
+      - .:/app
+    command: celery -A src.celery_app flower
+    depends_on:
+      - redis
+      - app
+      - db
+
+volumes:
+  pg_data:
