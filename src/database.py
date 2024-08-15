@@ -12,23 +12,9 @@ AsyncSessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_com
 Base = declarative_base()
 
 
-async def create_tables():
-    """
-    Подключается к базе данных и создает таблицы,
-    определенные в моделях, наследующихся от класса Base.
-    :return:
-    """
-    async with engine.begin() as conn:
-        # await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-
-
 async def get_db() -> AsyncSession:
     """
     Создает и возвращает экземпляр сессии базы данных.
     """
-    try:
-        async with AsyncSessionLocal() as session:
-            yield session
-    finally:
-        await session.close()
+    async with AsyncSessionLocal() as session:
+        yield session
