@@ -34,6 +34,7 @@
 - PostgreSQL
 - Pytest-asyncio
 - Docker
+- ReDoc
 - Swagger
 
 
