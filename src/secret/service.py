@@ -6,7 +6,7 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.secret.models import Secret
-from src.secret.schemas import SecretCreate, SecretKeyOut, SecretDecryptOut, SecretOut
+from src.secret.schemas import SecretCreate, SecretKeyOut, SecretDecryptOut
 
 # генерация ключа
 key = Fernet.generate_key()
