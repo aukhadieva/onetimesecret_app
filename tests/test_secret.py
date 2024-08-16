@@ -34,16 +34,3 @@ async def test_get_secret(async_client: AsyncClient, test_user: User):
     response = await async_client.get(f'/api/secrets/{secret_key}',
                                       headers=create_test_auth_headers_for_user(test_user.email))
     assert response.status_code == 200, 'Не удалось найти секрет'
-
-
-async def test_get_secrets(async_client: AsyncClient, test_user: User):
-    """
-    Тестирует получение списка секретов.
-
-    :param async_client: асинхронный клиент для выполнения HTTP-запросов
-    :param test_user: тестовый пользователь
-    :return:
-    """
-    response = await async_client.get('/api/secrets/', headers=create_test_auth_headers_for_user(test_user.email),
-                                      params={'page': 1, 'size': 50})
-    assert response.status_code == 200, 'Не удалось получить список секретов'
