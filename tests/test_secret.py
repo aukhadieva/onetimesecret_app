@@ -1,42 +1,49 @@
 from httpx import AsyncClient
 
-from tests.test_user import test_add_and_login_user
+from src.user.models import User
+from tests.conftest import create_test_auth_headers_for_user
 
 
-async def test_generate_secret(async_client: AsyncClient):
+async def test_generate_secret(async_client: AsyncClient, test_user: User):
     """
     Тестирует создание нового секрета.
 
     :param async_client: асинхронный клиент для выполнения HTTP-запросов
-    :return: кортеж, содержащий заголовки авторизации и passphrase созданного секрета
+    :param test_user: тестовый пользователь
+    :return:
     """
-    user_id, headers = await test_add_and_login_user(async_client)
     secret_data = {'lifetime': '5 минут', 'secret_content': 'secret_content', 'passphrase': 'passphrase'}
-    response = await async_client.post('/generate/', headers=headers, json=secret_data)
+    response = await async_client.post('/api/generate/', headers=create_test_auth_headers_for_user(test_user.email),
+                                       json=secret_data)
+
     assert response.status_code == 201, 'Секрет не был добавлен'
-    passphrase = response.json().get('passphrase')
-    return headers, passphrase
 
 
-async def test_get_secret(async_client: AsyncClient):
+async def test_get_secret(async_client: AsyncClient, test_user: User):
     """
     Тестирует получение секрета по его ключу.
 
     :param async_client: асинхронный клиент для выполнения HTTP-запросов
+    :param test_user: тестовый пользователь
     :return:
     """
-    headers, secret_key = await test_generate_secret(async_client)
-    response = await async_client.get(f'/secrets/{secret_key}', headers=headers)
+    secret_data = {'lifetime': '5 минут', 'secret_content': 'secret_content', 'passphrase': 'passphrase'}
+    response = await async_client.post('/api/generate/', headers=create_test_auth_headers_for_user(test_user.email),
+                                       json=secret_data)
+    secret_key = response.json().get('passphrase')
+    response = await async_client.get(f'/api/secrets/{secret_key}',
+                                      headers=create_test_auth_headers_for_user(test_user.email))
     assert response.status_code == 200, 'Не удалось найти секрет'
 
 
-async def test_get_secrets(async_client: AsyncClient):
+async def test_get_secrets(async_client: AsyncClient, test_user: User):
     """
     Тестирует получение списка секретов.
 
     :param async_client: асинхронный клиент для выполнения HTTP-запросов
+    :param test_user: тестовый пользователь
     :return:
     """
-    user_id, headers = await test_add_and_login_user(async_client)
-    response = await async_client.get('/secrets/', headers=headers, params={'page': 1, 'size': 50})
+    response = await async_client.get('/api/secrets/', headers=create_test_auth_headers_for_user(test_user.email),
+                                      params={'page': 1, 'size': 50})
     assert response.status_code == 200, 'Не удалось получить список секретов'
